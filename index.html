@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Приседания — семейный трекер</title>
+  <style>
+    :root {
+      --bg: #0f1115; --card: #171a21; --line: #262b36; --txt: #e8eaed; --muted: #9aa2b1;
+      --accent: #4f9cff; --ok: #34c759; --err: #ff5c5c; --radius: 16px;
+    }
+    @media (prefers-color-scheme: light) {
+      :root { --bg:#f4f6fa; --card:#fff; --line:#e6e9f0; --txt:#1a1d24; --muted:#697086; }
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body { margin: 0; background: var(--bg); color: var(--txt);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; line-height: 1.45;
+      padding: env(safe-area-inset-top) 16px calc(env(safe-area-inset-bottom) + 24px); }
+    .wrap { max-width: 760px; margin: 0 auto; }
+    h1 { font-size: 1.5rem; margin: 18px 4px 2px; display: flex; align-items: center; gap: 8px; }
+    .sub { color: var(--muted); font-size: .9rem; margin: 0 4px 16px; }
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+      padding: 18px; margin-bottom: 16px; }
+    .card h2 { margin: 0 0 14px; font-size: 1.05rem; }
+    .row { display: flex; flex-wrap: wrap; gap: 8px; }
+    button { font: inherit; cursor: pointer; border: 1px solid var(--line); background: var(--card);
+      color: var(--txt); border-radius: 12px; padding: 12px 16px; transition: .12s; }
+    button:active { transform: scale(.96); }
+    button.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+    button.ghost { background: transparent; }
+    .chip { padding: 10px 16px; border-radius: 999px; }
+    .chip.on { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+    input { font: inherit; color: var(--txt); background: var(--bg); border: 1px solid var(--line);
+      border-radius: 12px; padding: 12px 14px; width: 100%; }
+    label { display: block; font-size: .85rem; color: var(--muted); margin: 0 0 6px 2px; }
+    .field { margin-bottom: 12px; }
+    .big { font-size: 3rem; font-weight: 800; text-align: center; letter-spacing: -1px; }
+    .big small { font-size: 1rem; font-weight: 500; color: var(--muted); display: block; letter-spacing: 0; }
+    .quick button { flex: 1 1 0; min-width: 64px; font-weight: 600; }
+    .pm { width: 64px; height: 64px; border-radius: 50%; font-size: 1.6rem; font-weight: 700; padding: 0; }
+    .center { display: flex; align-items: center; justify-content: center; gap: 14px; }
+    table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+    .tablewrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    th, td { padding: 9px 10px; text-align: center; border-bottom: 1px solid var(--line); white-space: nowrap; }
+    th { color: var(--muted); font-weight: 600; font-size: .85rem; }
+    td.date { text-align: left; color: var(--muted); }
+    td.total { font-weight: 700; }
+    td.cell { cursor: pointer; border-radius: 8px; }
+    td.cell.me { color: var(--accent); font-weight: 600; }
+    td input { width: 68px; text-align: center; padding: 6px; }
+    .muted { color: var(--muted); }
+    .hint { color: var(--muted); font-size: .85rem; }
+    a { color: var(--accent); }
+    .toast { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%) translateY(120%);
+      background: #000d; color: #fff; padding: 11px 18px; border-radius: 999px; font-size: .9rem;
+      transition: transform .25s; z-index: 50; max-width: 90vw; }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.ok { background: #1c7c36e6; } .toast.err { background: #b3261ee6; }
+    .hidden { display: none !important; }
+    canvas { max-width: 100%; }
+    .topbar { display: flex; justify-content: space-between; align-items: flex-end; }
+    .iconbtn { padding: 8px 12px; font-size: .85rem; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div>
+        <h1>Приседания 🏋️</h1>
+        <p class="sub">Семейный трекер</p>
+      </div>
+      <button id="settingsBtn" class="iconbtn ghost" title="Настройки">⚙</button>
+    </div>
+
+    <!-- Онбординг / настройки -->
+    <section id="setup" class="card hidden">
+      <h2>Настройка</h2>
+      <p class="hint" id="setupHint"></p>
+      <div class="field" id="repoFields">
+        <label>Владелец репозитория (GitHub-логин)</label>
+        <input id="ownerInput" placeholder="например, ivan-petrov" autocomplete="off" />
+      </div>
+      <div class="field" id="repoFields2">
+        <label>Имя приватного репозитория с данными</label>
+        <input id="repoInput" placeholder="squats-data" autocomplete="off" />
+      </div>
+      <div class="field">
+        <label>Токен доступа (хранится только на этом устройстве)</label>
+        <input id="tokenInput" type="password" placeholder="github_pat_..." autocomplete="off" />
+      </div>
+      <div class="row">
+        <button class="primary" id="saveSetup">Сохранить</button>
+        <button class="ghost" id="closeSetup">Отмена</button>
+      </div>
+      <p class="hint" style="margin-top:12px">
+        Как создать токен и репозиторий — в инструкции (README). Токен нужен с правом
+        <b>Contents: Read and write</b> только на этот репозиторий.
+      </p>
+    </section>
+
+    <!-- Кто записывает -->
+    <section id="whoCard" class="card hidden">
+      <h2>Кто записывает?</h2>
+      <div class="row" id="people"></div>
+    </section>
+
+    <!-- Сегодня -->
+    <section id="todayCard" class="card hidden">
+      <h2 id="todayTitle">Сегодня</h2>
+      <div class="big" id="todayCount">0<small>приседаний сегодня</small></div>
+      <div class="center" style="margin:18px 0">
+        <button class="pm" id="minus">−</button>
+        <button class="pm primary" id="plus">+</button>
+      </div>
+      <div class="row quick" style="margin-bottom:10px">
+        <button data-add="10">+10</button>
+        <button data-add="20">+20</button>
+        <button data-add="50">+50</button>
+        <button data-add="100">+100</button>
+      </div>
+      <div class="row">
+        <input id="exactInput" type="number" inputmode="numeric" min="0" placeholder="точное число за сегодня" />
+        <button id="setExact">OK</button>
+      </div>
+    </section>
+
+    <!-- История -->
+    <section id="historyCard" class="card hidden">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <h2 style="margin:0">История</h2>
+        <button class="iconbtn ghost" id="refreshBtn">⟳ Обновить</button>
+      </div>
+      <div class="tablewrap" style="margin-top:12px">
+        <table id="historyTable"></table>
+      </div>
+      <p class="hint" id="historyEmpty">Пока нет записей. Запишите приседания за сегодня ☝️</p>
+    </section>
+
+    <!-- Графики -->
+    <section id="chartsCard" class="card hidden">
+      <h2>Графики</h2>
+      <div style="margin-bottom:22px"><canvas id="lineChart" height="220"></canvas></div>
+      <div><canvas id="barChart" height="200"></canvas></div>
+    </section>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+  /* =====================================================================
+   * ВОЛНА 1 — Слой хранилища (data.json в приватном GitHub-репозитории)
+   * ===================================================================== */
+  const CONFIG = {
+    owner: 'SergeyRazzhivin',
+    repo:  'squats-data',
+    path:  'data.json',
+    branch:'main',
+  };
+  const TOKEN_KEY = 'gh_token';
+  const getToken = () => localStorage.getItem(TOKEN_KEY) || '';
+  const setToken = (t) => localStorage.setItem(TOKEN_KEY, (t || '').trim());
+  const clearToken = () => localStorage.removeItem(TOKEN_KEY);
+
+  // Владелец/репо можно задать в настройках (без правки кода). Иначе берётся CONFIG.
+  const cfg = () => ({
+    owner: (localStorage.getItem('gh_owner') || CONFIG.owner).trim(),
+    repo:  (localStorage.getItem('gh_repo')  || CONFIG.repo).trim(),
+    path:  CONFIG.path, branch: CONFIG.branch,
+  });
+  const setRepo = (owner, repo) => {
+    localStorage.setItem('gh_owner', (owner || '').trim());
+    localStorage.setItem('gh_repo',  (repo  || '').trim());
+  };
+  const isConfigured = () => {
+    const c = cfg();
+    return !!getToken() && !!c.owner && c.owner !== 'YOUR_GITHUB_USERNAME' && !!c.repo;
+  };
+
+  class StorageError extends Error {
+    constructor(message, { status = 0, kind = 'error' } = {}) {
+      super(message); this.name = 'StorageError'; this.status = status; this.kind = kind;
+    }
+  }
+  function utf8ToBase64(str) {
+    const bytes = new TextEncoder().encode(str);
+    let bin = ''; bytes.forEach((b) => (bin += String.fromCharCode(b)));
+    return btoa(bin);
+  }
+  function base64ToUtf8(b64) {
+    const bin = atob((b64 || '').replace(/\s/g, ''));
+    return new TextDecoder().decode(Uint8Array.from(bin, (c) => c.charCodeAt(0)));
+  }
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const apiUrl = () => {
+    const c = cfg();
+    return `https://api.github.com/repos/${c.owner}/${c.repo}/contents/${c.path}`;
+  };
+  const isValidDate = (s) =>
+    typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s) && !Number.isNaN(Date.parse(s));
+  const isValidCount = (n) => Number.isInteger(n) && n >= 0;
+
+  async function ghFetch(url, options = {}) {
+    const token = getToken();
+    if (!token) throw new StorageError('Нет токена доступа', { kind: 'no-token' });
+    let res;
+    try {
+      res = await fetch(url, { ...options, cache: 'no-store', headers: {
+        Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28',
+        ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+      }});
+    } catch (e) { throw new StorageError('Нет соединения с сетью', { kind: 'network' }); }
+    if (res.status === 401) throw new StorageError('Неверный или просроченный токен', { status: 401, kind: 'auth' });
+    if (res.status === 403) {
+      if (res.headers.get('X-RateLimit-Remaining') === '0')
+        throw new StorageError('Превышен лимит запросов GitHub, попробуйте позже', { status: 403, kind: 'rate-limit' });
+      throw new StorageError('Доступ запрещён (проверьте права токена)', { status: 403, kind: 'auth' });
+    }
+    if (res.status === 404 && options.method !== 'PUT')
+      return res; // обрабатываем выше (файла ещё нет)
+    return res;
+  }
+  async function getFile() {
+    const res = await ghFetch(`${apiUrl()}?ref=${encodeURIComponent(cfg().branch)}`);
+    if (res.status === 404) return { data: emptyData(), sha: null };
+    if (!res.ok) throw new StorageError(`Не удалось прочитать данные (HTTP ${res.status})`, { status: res.status });
+    const json = await res.json();
+    let data;
+    try { data = JSON.parse(base64ToUtf8(json.content)); }
+    catch (e) { throw new StorageError('Файл данных повреждён (невалидный JSON)', { kind: 'error' }); }
+    return { data: normalize(data), sha: json.sha };
+  }
+  async function putFile(data, sha, message) {
+    const body = { message: message || 'Обновление приседаний',
+      content: utf8ToBase64(JSON.stringify(data, null, 2)), branch: cfg().branch };
+    if (sha) body.sha = sha;
+    const res = await ghFetch(apiUrl(), { method: 'PUT', body: JSON.stringify(body) });
+    if (res.status === 409 || res.status === 422)
+      throw new StorageError('Конфликт записи', { status: res.status, kind: 'conflict' });
+    if (!res.ok) throw new StorageError(`Не удалось сохранить (HTTP ${res.status})`, { status: res.status });
+    return res.json();
+  }
+  function emptyData() { return { version: 1, people: ['Папа', 'Мама', 'Дочка'], days: {} }; }
+  function normalize(data) {
+    const d = data && typeof data === 'object' ? data : {};
+    return { version: d.version || 1,
+      people: Array.isArray(d.people) && d.people.length ? d.people : emptyData().people,
+      days: d.days && typeof d.days === 'object' ? d.days : {} };
+  }
+  async function mutate(fn, message, attempts = 5) {
+    let lastErr;
+    for (let i = 0; i < attempts; i++) {
+      const { data, sha } = await getFile();
+      fn(data);
+      try { await putFile(data, sha, message); return data; }
+      catch (e) { lastErr = e;
+        if (e.kind === 'conflict') { await sleep(200 * (i + 1)); continue; }
+        throw e; }
+    }
+    throw lastErr || new StorageError('Не удалось сохранить после нескольких попыток', { kind: 'conflict' });
+  }
+  async function loadData() { return (await getFile()).data; }
+  async function saveDay(date, person, count) {
+    if (!isValidDate(date)) throw new StorageError('Неверная дата', { kind: 'validation' });
+    count = Number(count);
+    if (!isValidCount(count)) throw new StorageError('Число должно быть целым ≥ 0', { kind: 'validation' });
+    return mutate((data) => {
+      if (!data.people.includes(person)) throw new StorageError(`Неизвестный человек: ${person}`, { kind: 'validation' });
+      data.days[date] = data.days[date] || {};
+      if (count === 0) delete data.days[date][person]; else data.days[date][person] = count;
+      if (Object.keys(data.days[date]).length === 0) delete data.days[date];
+    }, `Приседания: ${person} ${date} = ${count}`);
+  }
+  async function incDay(date, person, delta) {
+    if (!isValidDate(date)) throw new StorageError('Неверная дата', { kind: 'validation' });
+    delta = Number(delta);
+    if (!Number.isInteger(delta)) throw new StorageError('Шаг должен быть целым', { kind: 'validation' });
+    return mutate((data) => {
+      if (!data.people.includes(person)) throw new StorageError(`Неизвестный человек: ${person}`, { kind: 'validation' });
+      data.days[date] = data.days[date] || {};
+      const next = Math.max(0, (data.days[date][person] || 0) + delta);
+      if (next === 0) delete data.days[date][person]; else data.days[date][person] = next;
+      if (Object.keys(data.days[date]).length === 0) delete data.days[date];
+    }, `Приседания: ${person} ${date} ${delta >= 0 ? '+' : ''}${delta}`);
+  }
+  function todayStr(d = new Date()) {
+    const p = (n) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+  }
+  window.Squats = { CONFIG, StorageError, getToken, setToken, clearToken, setRepo, cfg,
+    isConfigured, loadData, saveDay, incDay, todayStr, isValidDate, isValidCount };
+
+  /* =====================================================================
+   * ВОЛНЫ 2–3 — Интерфейс: онбординг, выбор человека, ввод, таблица, графики
+   * ===================================================================== */
+  const $ = (id) => document.getElementById(id);
+  const PALETTE = ['#4f9cff', '#ff7a59', '#34c759', '#c77dff', '#ffd60a', '#2dd4bf'];
+
+  const state = { data: null, me: localStorage.getItem('me') || null, busy: false };
+  let lineChart = null, barChart = null, chartReady = false;
+
+  // --- Тосты ---
+  let toastTimer;
+  function toast(msg, kind = '') {
+    const t = $('toast'); t.textContent = msg; t.className = `toast show ${kind}`;
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => (t.className = 'toast'), 2600);
+  }
+  function errToast(e) {
+    const map = { 'no-token': 'Сначала введите токен в настройках ⚙',
+      auth: 'Токен неверный или без прав. Проверьте в настройках ⚙',
+      network: 'Нет интернета. Проверьте соединение',
+      'rate-limit': 'GitHub временно ограничил запросы, подождите',
+      conflict: 'Кто-то записал одновременно — попробуйте ещё раз',
+      validation: e.message };
+    toast(map[e.kind] || e.message || 'Ошибка', 'err');
+    console.error(e);
+  }
+
+  // --- Настройки / онбординг ---
+  function openSetup() {
+    const needRepo = !(cfg().owner && cfg().owner !== 'YOUR_GITHUB_USERNAME' && cfg().repo);
+    $('ownerInput').value = cfg().owner === 'YOUR_GITHUB_USERNAME' ? '' : cfg().owner;
+    $('repoInput').value = cfg().repo || 'squats-data';
+    $('tokenInput').value = getToken();
+    $('setupHint').textContent = isConfigured()
+      ? 'Можно изменить токен или репозиторий.'
+      : 'Заполните данные, чтобы приложение получило доступ к общему файлу.';
+    $('setup').classList.remove('hidden');
+    $('closeSetup').classList.toggle('hidden', !isConfigured());
+  }
+  function closeSetup() { $('setup').classList.add('hidden'); }
+  async function saveSetup() {
+    const owner = $('ownerInput').value.trim();
+    const repo = $('repoInput').value.trim() || 'squats-data';
+    const token = $('tokenInput').value.trim();
+    if (!owner) return toast('Укажите владельца репозитория', 'err');
+    if (!token) return toast('Вставьте токен', 'err');
+    setRepo(owner, repo); setToken(token);
+    closeSetup(); toast('Сохранено', 'ok');
+    await refresh();
+  }
+
+  // --- Выбор человека ---
+  function renderPeople() {
+    const box = $('people'); box.innerHTML = '';
+    (state.data?.people || []).forEach((name) => {
+      const b = document.createElement('button');
+      b.className = 'chip' + (name === state.me ? ' on' : '');
+      b.textContent = name;
+      b.onclick = () => { state.me = name; localStorage.setItem('me', name); renderAll(); };
+      box.appendChild(b);
+    });
+  }
+
+  // --- Сегодня ---
+  function todayCount() {
+    const d = state.data?.days?.[todayStr()] || {};
+    return d[state.me] || 0;
+  }
+  function renderToday() {
+    if (!state.me) { $('todayCard').classList.add('hidden'); return; }
+    $('todayCard').classList.remove('hidden');
+    $('todayTitle').textContent = `Сегодня · ${state.me}`;
+    $('todayCount').innerHTML = `${todayCount()}<small>приседаний сегодня</small>`;
+  }
+  async function changeToday(delta) { await guard(() => incDay(todayStr(), state.me, delta)); }
+  async function setExact(n) { await guard(() => saveDay(todayStr(), state.me, n)); }
+
+  // Обёртка: блокирует двойные нажатия, показывает статус, перерисовывает.
+  async function guard(action) {
+    if (state.busy) return;
+    if (!state.me) return toast('Сначала выберите, кто записывает', 'err');
+    state.busy = true; toast('Сохраняю…');
+    try {
+      state.data = await action();
+      renderAll(); toast('Сохранено ✓', 'ok');
+    } catch (e) { errToast(e); }
+    finally { state.busy = false; }
+  }
+
+  // --- Таблица истории ---
+  function sortedDates() { return Object.keys(state.data?.days || {}).sort().reverse(); }
+  function renderTable() {
+    const people = state.data?.people || [];
+    const dates = sortedDates();
+    $('historyEmpty').classList.toggle('hidden', dates.length > 0);
+    const table = $('historyTable');
+    if (!dates.length) { table.innerHTML = ''; return; }
+    const head = `<tr><th>Дата</th>${people.map((p) => `<th>${esc(p)}</th>`).join('')}<th>Итого</th></tr>`;
+    const rows = dates.map((date) => {
+      const day = state.data.days[date] || {};
+      const total = people.reduce((s, p) => s + (day[p] || 0), 0);
+      const cells = people.map((p) => {
+        const v = day[p] || 0;
+        const meCls = p === state.me ? ' me' : '';
+        return `<td class="cell${meCls}" data-date="${date}" data-person="${esc(p)}">${v || '·'}</td>`;
+      }).join('');
+      return `<tr><td class="date">${fmtDate(date)}</td>${cells}<td class="total">${total}</td></tr>`;
+    }).join('');
+    table.innerHTML = head + rows;
+    table.querySelectorAll('td.cell').forEach((td) => (td.onclick = () => editCell(td)));
+  }
+  function editCell(td) {
+    if (td.querySelector('input')) return;
+    const date = td.dataset.date, person = td.dataset.person;
+    const cur = state.data.days[date]?.[person] || 0;
+    td.innerHTML = `<input type="number" inputmode="numeric" min="0" value="${cur}">`;
+    const inp = td.querySelector('input'); inp.focus(); inp.select();
+    const commit = async () => {
+      const n = parseInt(inp.value, 10);
+      if (Number.isNaN(n) || n < 0) { renderTable(); return; }
+      if (n === cur) { renderTable(); return; }
+      await guard(() => saveDay(date, person, n));
+    };
+    inp.onblur = commit;
+    inp.onkeydown = (e) => { if (e.key === 'Enter') inp.blur(); if (e.key === 'Escape') renderTable(); };
+  }
+
+  // --- Графики ---
+  function renderCharts() {
+    if (!chartReady || typeof Chart === 'undefined') return;
+    const people = state.data?.people || [];
+    const datesAsc = Object.keys(state.data?.days || {}).sort();
+    $('chartsCard').classList.toggle('hidden', datesAsc.length === 0);
+    if (!datesAsc.length) return;
+
+    const lineData = {
+      labels: datesAsc.map(fmtDate),
+      datasets: people.map((p, i) => ({
+        label: p, data: datesAsc.map((d) => state.data.days[d]?.[p] || 0),
+        borderColor: PALETTE[i % PALETTE.length], backgroundColor: PALETTE[i % PALETTE.length],
+        tension: .3, spanGaps: true, pointRadius: 3,
+      })),
+    };
+    const totals = people.map((p) => datesAsc.reduce((s, d) => s + (state.data.days[d]?.[p] || 0), 0));
+    const barData = { labels: people,
+      datasets: [{ label: 'Всего приседаний', data: totals,
+        backgroundColor: people.map((_, i) => PALETTE[i % PALETTE.length]) }] };
+    const opts = { responsive: true, plugins: { legend: { labels: { color: cssVar('--txt') } } },
+      scales: { x: { ticks: { color: cssVar('--muted') }, grid: { color: cssVar('--line') } },
+        y: { beginAtZero: true, ticks: { color: cssVar('--muted') }, grid: { color: cssVar('--line') } } } };
+
+    if (lineChart) { lineChart.data = lineData; lineChart.update(); }
+    else lineChart = new Chart($('lineChart'), { type: 'line', data: lineData, options: opts });
+    if (barChart) { barChart.data = barData; barChart.update(); }
+    else barChart = new Chart($('barChart'), { type: 'bar', data: barData,
+      options: { ...opts, plugins: { legend: { display: false } } } });
+  }
+
+  // --- Утилиты ---
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const cssVar = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const MONTHS = ['янв','фев','мар','апр','мая','июн','июл','авг','сен','окт','ноя','дек'];
+  function fmtDate(s) { const [y, m, d] = s.split('-'); return `${+d} ${MONTHS[+m - 1]}`; }
+
+  // --- Рендер всего ---
+  function renderAll() {
+    renderPeople(); renderToday(); renderTable(); renderCharts();
+    $('whoCard').classList.remove('hidden');
+    $('historyCard').classList.remove('hidden');
+  }
+
+  async function refresh() {
+    if (!isConfigured()) { openSetup(); $('whoCard').classList.add('hidden');
+      $('todayCard').classList.add('hidden'); $('historyCard').classList.add('hidden');
+      $('chartsCard').classList.add('hidden'); return; }
+    toast('Загрузка…');
+    try {
+      state.data = await loadData();
+      if (state.me && !state.data.people.includes(state.me)) state.me = null;
+      if (!state.me && state.data.people.length) { /* пусть выберет сам */ }
+      renderAll(); toast('Готово', 'ok');
+    } catch (e) { errToast(e); if (e.kind === 'no-token' || e.kind === 'auth') openSetup(); }
+  }
+
+  // --- События ---
+  $('settingsBtn').onclick = openSetup;
+  $('saveSetup').onclick = saveSetup;
+  $('closeSetup').onclick = closeSetup;
+  $('plus').onclick = () => changeToday(1);
+  $('minus').onclick = () => changeToday(-1);
+  document.querySelectorAll('[data-add]').forEach((b) => (b.onclick = () => changeToday(+b.dataset.add)));
+  $('setExact').onclick = () => {
+    const n = parseInt($('exactInput').value, 10);
+    if (Number.isNaN(n) || n < 0) return toast('Введите целое число ≥ 0', 'err');
+    $('exactInput').value = ''; setExact(n);
+  };
+  $('refreshBtn').onclick = refresh;
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && isConfigured()) refresh(); });
+
+  // --- Подгрузка Chart.js и старт ---
+  (function loadChartJs() {
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js';
+    s.onload = () => { chartReady = true; renderCharts(); };
+    s.onerror = () => { chartReady = false; }; // приложение работает и без графиков
+    document.head.appendChild(s);
+  })();
+
+  refresh();
+  </script>
+</body>
+</html>
