@@ -48,8 +48,15 @@
     .tabs { display: flex; gap: 5px; background: var(--card); border: 1px solid var(--line);
       border-radius: 14px; padding: 5px; margin-bottom: 14px; position: sticky; top: 6px; z-index: 5; }
     .tabs button { flex: 1; border: none; background: transparent; padding: 10px 6px;
-      border-radius: 10px; color: var(--muted); font-weight: 600; font-size: .92rem; }
+      border-radius: 10px; color: var(--muted); font-weight: 600; font-size: .92rem; white-space: nowrap; }
     .tabs button.on { background: var(--accent); color: #fff; }
+    @media (max-width: 480px) {
+      .tabs { gap: 3px; padding: 4px; }
+      .tabs button { padding: 9px 3px; font-size: .8rem; }
+    }
+    @media (max-width: 360px) {
+      .tabs button { font-size: .72rem; }
+    }
     .panel.hidden { display: none; }
 
     /* Запись */
