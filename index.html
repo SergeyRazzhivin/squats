@@ -81,6 +81,11 @@
     .stat .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
     .stat .kv { display: flex; justify-content: space-between; font-size: .9rem; padding: 2px 0; }
     .stat .kv span:first-child { color: var(--muted); }
+    .seg { display: inline-flex; gap: 4px; background: var(--bg); border: 1px solid var(--line);
+      border-radius: 10px; padding: 4px; margin-bottom: 14px; }
+    .seg button { border: none; background: transparent; color: var(--muted);
+      padding: 7px 13px; border-radius: 7px; font-size: .85rem; font-weight: 600; }
+    .seg button.on { background: var(--accent); color: #fff; }
     .chartbox { position: relative; height: 230px; margin-bottom: 6px; }
     .chartcap { color: var(--muted); font-size: .82rem; text-align: center; margin: 0 0 16px; }
 
@@ -186,6 +191,11 @@
       <h2>Статистика</h2>
       <div class="statgrid" id="statGrid"></div>
       <div id="statCharts" style="margin-top:18px">
+        <div class="seg" id="period">
+          <button data-period="all" class="on">Всё время</button>
+          <button data-period="month">Месяц</button>
+          <button data-period="week">Неделя</button>
+        </div>
         <p class="chartcap">Динамика по дням</p>
         <div class="chartbox"><canvas id="lineChart"></canvas></div>
         <p class="chartcap">Всего за всё время</p>
@@ -345,6 +355,7 @@
     me: localStorage.getItem('me') || null,
     date: todayStr(),
     tab: 'record',
+    period: 'all',
     busy: false,
   };
   let lineChart = null, barChart = null, chartReady = false;
@@ -523,10 +534,18 @@
   }
 
   // --- Графики ---
+  // Ограничить даты выбранным периодом (отсчёт от последней записи).
+  function periodDates(datesAsc) {
+    if (state.period === 'all' || !datesAsc.length) return datesAsc;
+    const end = parseDate(datesAsc[datesAsc.length - 1]);
+    const span = state.period === 'week' ? 7 : 30;
+    const from = todayStr(new Date(end.getFullYear(), end.getMonth(), end.getDate() - (span - 1)));
+    return datesAsc.filter((d) => d >= from);
+  }
   function renderCharts() {
     if (!chartReady || typeof Chart === 'undefined' || state.tab !== 'stats') return;
     const people = state.data?.people || [];
-    const datesAsc = sortedDates(true);
+    const datesAsc = periodDates(sortedDates(true));
     if (!datesAsc.length) return;
     const lineData = { labels: datesAsc.map(fmtShort),
       datasets: people.map((p, i) => ({ label: p, data: datesAsc.map((d) => state.data.days[d]?.[p] || 0),
@@ -577,6 +596,11 @@
   $('saveSetup').onclick = saveSetup;
   $('closeSetup').onclick = closeSetup;
   document.querySelectorAll('#tabs button').forEach((b) => (b.onclick = () => setTab(b.dataset.tab)));
+  document.querySelectorAll('#period button').forEach((b) => (b.onclick = () => {
+    state.period = b.dataset.period;
+    document.querySelectorAll('#period button').forEach((x) => x.classList.toggle('on', x === b));
+    renderCharts();
+  }));
   $('dayPrev').onclick = () => { state.date = shiftDate(state.date, -1); renderRecord(); };
   $('dayNext').onclick = () => { if (state.date < todayStr()) { state.date = shiftDate(state.date, 1); renderRecord(); } };
   $('datePicker').onchange = (e) => { state.date = e.target.value || todayStr(); renderRecord(); };
