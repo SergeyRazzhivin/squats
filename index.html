@@ -15,39 +15,75 @@
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body { margin: 0; background: var(--bg); color: var(--txt);
       font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; line-height: 1.45;
-      padding: env(safe-area-inset-top) 16px calc(env(safe-area-inset-bottom) + 24px); }
-    .wrap { max-width: 760px; margin: 0 auto; }
-    h1 { font-size: 1.5rem; margin: 18px 4px 2px; display: flex; align-items: center; gap: 8px; }
-    .sub { color: var(--muted); font-size: .9rem; margin: 0 4px 16px; }
+      padding: env(safe-area-inset-top) 14px calc(env(safe-area-inset-bottom) + 24px); }
+    .wrap { max-width: 600px; margin: 0 auto; }
+    h1 { font-size: 1.4rem; margin: 16px 2px 0; display: flex; align-items: center; gap: 8px; }
+    .sub { color: var(--muted); font-size: .85rem; margin: 0 2px 14px; }
     .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
-      padding: 18px; margin-bottom: 16px; }
-    .card h2 { margin: 0 0 14px; font-size: 1.05rem; }
+      padding: 16px; margin-bottom: 14px; }
+    .card h2 { margin: 0 0 12px; font-size: 1rem; }
     .row { display: flex; flex-wrap: wrap; gap: 8px; }
     button { font: inherit; cursor: pointer; border: 1px solid var(--line); background: var(--card);
-      color: var(--txt); border-radius: 12px; padding: 12px 16px; transition: .12s; }
+      color: var(--txt); border-radius: 12px; padding: 11px 15px; transition: .12s; }
     button:active { transform: scale(.96); }
     button.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
     button.ghost { background: transparent; }
-    .chip { padding: 10px 16px; border-radius: 999px; }
+    .chip { padding: 9px 16px; border-radius: 999px; }
     .chip.on { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
     input { font: inherit; color: var(--txt); background: var(--bg); border: 1px solid var(--line);
-      border-radius: 12px; padding: 12px 14px; width: 100%; }
+      border-radius: 12px; padding: 11px 13px; width: 100%; }
+    input[type=date] { width: auto; text-align: center; }
     label { display: block; font-size: .85rem; color: var(--muted); margin: 0 0 6px 2px; }
     .field { margin-bottom: 12px; }
-    .big { font-size: 3rem; font-weight: 800; text-align: center; letter-spacing: -1px; }
-    .big small { font-size: 1rem; font-weight: 500; color: var(--muted); display: block; letter-spacing: 0; }
-    .quick button { flex: 1 1 0; min-width: 64px; font-weight: 600; }
-    .pm { width: 64px; height: 64px; border-radius: 50%; font-size: 1.6rem; font-weight: 700; padding: 0; }
-    .center { display: flex; align-items: center; justify-content: center; gap: 14px; }
+
+    /* Топ-бар */
+    .topbar { display: flex; justify-content: space-between; align-items: flex-start; }
+    .iconbtn { padding: 8px 11px; font-size: .85rem; }
+
+    /* Кто записывает — слим */
+    .whobar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 4px 2px 12px; }
+    .whobar .lbl { color: var(--muted); font-size: .85rem; }
+
+    /* Табы */
+    .tabs { display: flex; gap: 5px; background: var(--card); border: 1px solid var(--line);
+      border-radius: 14px; padding: 5px; margin-bottom: 14px; position: sticky; top: 6px; z-index: 5; }
+    .tabs button { flex: 1; border: none; background: transparent; padding: 10px 6px;
+      border-radius: 10px; color: var(--muted); font-weight: 600; font-size: .92rem; }
+    .tabs button.on { background: var(--accent); color: #fff; }
+    .panel.hidden { display: none; }
+
+    /* Запись */
+    .datenav { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 6px; }
+    .datenav .nav { width: 42px; height: 42px; padding: 0; border-radius: 12px; font-size: 1.2rem; }
+    .datelabel { text-align: center; color: var(--muted); font-size: .85rem; margin-bottom: 14px; min-height: 1.1em; }
+    .big { font-size: 2.8rem; font-weight: 800; text-align: center; letter-spacing: -1px; line-height: 1.1; }
+    .big small { font-size: .9rem; font-weight: 500; color: var(--muted); display: block; letter-spacing: 0; }
+    .center { display: flex; align-items: center; justify-content: center; gap: 16px; }
+    .quick button { flex: 1 1 0; min-width: 60px; font-weight: 600; }
+    .pm { width: 60px; height: 60px; border-radius: 50%; font-size: 1.6rem; font-weight: 700; padding: 0; }
+
+    /* Таблица */
     table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
     .tablewrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
     th, td { padding: 9px 10px; text-align: center; border-bottom: 1px solid var(--line); white-space: nowrap; }
-    th { color: var(--muted); font-weight: 600; font-size: .85rem; }
-    td.date { text-align: left; color: var(--muted); }
+    th { color: var(--muted); font-weight: 600; font-size: .82rem; }
+    td.date { text-align: left; color: var(--muted); cursor: pointer; }
+    td.date:hover { color: var(--accent); }
     td.total { font-weight: 700; }
     td.cell { cursor: pointer; border-radius: 8px; }
     td.cell.me { color: var(--accent); font-weight: 600; }
-    td input { width: 68px; text-align: center; padding: 6px; }
+    td input { width: 64px; text-align: center; padding: 6px; }
+
+    /* Статистика */
+    .statgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+    .stat { background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+    .stat .name { font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+    .stat .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+    .stat .kv { display: flex; justify-content: space-between; font-size: .9rem; padding: 2px 0; }
+    .stat .kv span:first-child { color: var(--muted); }
+    .chartbox { position: relative; height: 230px; margin-bottom: 6px; }
+    .chartcap { color: var(--muted); font-size: .82rem; text-align: center; margin: 0 0 16px; }
+
     .muted { color: var(--muted); }
     .hint { color: var(--muted); font-size: .85rem; }
     a { color: var(--accent); }
@@ -58,8 +94,6 @@
     .toast.ok { background: #1c7c36e6; } .toast.err { background: #b3261ee6; }
     .hidden { display: none !important; }
     canvas { max-width: 100%; }
-    .topbar { display: flex; justify-content: space-between; align-items: flex-end; }
-    .iconbtn { padding: 8px 12px; font-size: .85rem; }
   </style>
 </head>
 <body>
@@ -76,11 +110,11 @@
     <section id="setup" class="card hidden">
       <h2>Настройка</h2>
       <p class="hint" id="setupHint"></p>
-      <div class="field" id="repoFields">
+      <div class="field">
         <label>Владелец репозитория (GitHub-логин)</label>
         <input id="ownerInput" placeholder="например, ivan-petrov" autocomplete="off" />
       </div>
-      <div class="field" id="repoFields2">
+      <div class="field">
         <label>Имя приватного репозитория с данными</label>
         <input id="repoInput" placeholder="squats-data" autocomplete="off" />
       </div>
@@ -93,22 +127,33 @@
         <button class="ghost" id="closeSetup">Отмена</button>
       </div>
       <p class="hint" style="margin-top:12px">
-        Как создать токен и репозиторий — в инструкции (README). Токен нужен с правом
-        <b>Contents: Read and write</b> только на этот репозиторий.
+        Токен нужен с правом <b>Contents: Read and write</b> на репозиторий <b>данных</b>.
       </p>
     </section>
 
-    <!-- Кто записывает -->
-    <section id="whoCard" class="card hidden">
-      <h2>Кто записывает?</h2>
-      <div class="row" id="people"></div>
-    </section>
+    <!-- Кто записывает (слим, всегда видно) -->
+    <div id="whobar" class="whobar hidden">
+      <span class="lbl">Кто записывает:</span>
+      <div class="row" id="people" style="gap:6px"></div>
+    </div>
 
-    <!-- Сегодня -->
-    <section id="todayCard" class="card hidden">
-      <h2 id="todayTitle">Сегодня</h2>
-      <div class="big" id="todayCount">0<small>приседаний сегодня</small></div>
-      <div class="center" style="margin:18px 0">
+    <!-- Табы -->
+    <nav id="tabs" class="tabs hidden">
+      <button data-tab="record" class="on">📝 Запись</button>
+      <button data-tab="history">📅 История</button>
+      <button data-tab="stats">📊 Статистика</button>
+    </nav>
+
+    <!-- ВКЛАДКА: Запись -->
+    <section id="panel-record" class="panel card hidden">
+      <div class="datenav">
+        <button class="nav" id="dayPrev">‹</button>
+        <input id="datePicker" type="date" />
+        <button class="nav" id="dayNext">›</button>
+      </div>
+      <div class="datelabel" id="dateLabel"></div>
+      <div class="big" id="todayCount">0<small>приседаний</small></div>
+      <div class="center" style="margin:16px 0">
         <button class="pm" id="minus">−</button>
         <button class="pm primary" id="plus">+</button>
       </div>
@@ -119,13 +164,13 @@
         <button data-add="100">+100</button>
       </div>
       <div class="row">
-        <input id="exactInput" type="number" inputmode="numeric" min="0" placeholder="точное число за сегодня" />
+        <input id="exactInput" type="number" inputmode="numeric" min="0" placeholder="точное число за этот день" />
         <button id="setExact">OK</button>
       </div>
     </section>
 
-    <!-- История -->
-    <section id="historyCard" class="card hidden">
+    <!-- ВКЛАДКА: История -->
+    <section id="panel-history" class="panel card hidden">
       <div style="display:flex;justify-content:space-between;align-items:center">
         <h2 style="margin:0">История</h2>
         <button class="iconbtn ghost" id="refreshBtn">⟳ Обновить</button>
@@ -133,14 +178,20 @@
       <div class="tablewrap" style="margin-top:12px">
         <table id="historyTable"></table>
       </div>
-      <p class="hint" id="historyEmpty">Пока нет записей. Запишите приседания за сегодня ☝️</p>
+      <p class="hint" id="historyEmpty">Пока нет записей. Запишите приседания на вкладке «Запись» ☝️</p>
     </section>
 
-    <!-- Графики -->
-    <section id="chartsCard" class="card hidden">
-      <h2>Графики</h2>
-      <div style="margin-bottom:22px"><canvas id="lineChart" height="220"></canvas></div>
-      <div><canvas id="barChart" height="200"></canvas></div>
+    <!-- ВКЛАДКА: Статистика -->
+    <section id="panel-stats" class="panel card hidden">
+      <h2>Статистика</h2>
+      <div class="statgrid" id="statGrid"></div>
+      <div id="statCharts" style="margin-top:18px">
+        <p class="chartcap">Динамика по дням</p>
+        <div class="chartbox"><canvas id="lineChart"></canvas></div>
+        <p class="chartcap">Всего за всё время</p>
+        <div class="chartbox"><canvas id="barChart"></canvas></div>
+      </div>
+      <p class="hint" id="statsEmpty">Графики появятся после первых записей.</p>
     </section>
   </div>
 
@@ -160,8 +211,6 @@
   const getToken = () => localStorage.getItem(TOKEN_KEY) || '';
   const setToken = (t) => localStorage.setItem(TOKEN_KEY, (t || '').trim());
   const clearToken = () => localStorage.removeItem(TOKEN_KEY);
-
-  // Владелец/репо можно задать в настройках (без правки кода). Иначе берётся CONFIG.
   const cfg = () => ({
     owner: (localStorage.getItem('gh_owner') || CONFIG.owner).trim(),
     repo:  (localStorage.getItem('gh_repo')  || CONFIG.repo).trim(),
@@ -175,7 +224,6 @@
     const c = cfg();
     return !!getToken() && !!c.owner && c.owner !== 'YOUR_GITHUB_USERNAME' && !!c.repo;
   };
-
   class StorageError extends Error {
     constructor(message, { status = 0, kind = 'error' } = {}) {
       super(message); this.name = 'StorageError'; this.status = status; this.kind = kind;
@@ -191,10 +239,8 @@
     return new TextDecoder().decode(Uint8Array.from(bin, (c) => c.charCodeAt(0)));
   }
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-  const apiUrl = () => {
-    const c = cfg();
-    return `https://api.github.com/repos/${c.owner}/${c.repo}/contents/${c.path}`;
-  };
+  const apiUrl = () => { const c = cfg();
+    return `https://api.github.com/repos/${c.owner}/${c.repo}/contents/${c.path}`; };
   const isValidDate = (s) =>
     typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s) && !Number.isNaN(Date.parse(s));
   const isValidCount = (n) => Number.isInteger(n) && n >= 0;
@@ -216,8 +262,6 @@
         throw new StorageError('Превышен лимит запросов GitHub, попробуйте позже', { status: 403, kind: 'rate-limit' });
       throw new StorageError('Доступ запрещён (проверьте права токена)', { status: 403, kind: 'auth' });
     }
-    if (res.status === 404 && options.method !== 'PUT')
-      return res; // обрабатываем выше (файла ещё нет)
     return res;
   }
   async function getFile() {
@@ -291,12 +335,18 @@
     isConfigured, loadData, saveDay, incDay, todayStr, isValidDate, isValidCount };
 
   /* =====================================================================
-   * ВОЛНЫ 2–3 — Интерфейс: онбординг, выбор человека, ввод, таблица, графики
+   * ИНТЕРФЕЙС — табы, выбор даты (календарь), запись, история, статистика
    * ===================================================================== */
   const $ = (id) => document.getElementById(id);
   const PALETTE = ['#4f9cff', '#ff7a59', '#34c759', '#c77dff', '#ffd60a', '#2dd4bf'];
 
-  const state = { data: null, me: localStorage.getItem('me') || null, busy: false };
+  const state = {
+    data: null,
+    me: localStorage.getItem('me') || null,
+    date: todayStr(),
+    tab: 'record',
+    busy: false,
+  };
   let lineChart = null, barChart = null, chartReady = false;
 
   // --- Тосты ---
@@ -316,9 +366,22 @@
     console.error(e);
   }
 
+  // --- Даты ---
+  const MONTHS = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+  const MON_SHORT = ['янв','фев','мар','апр','мая','июн','июл','авг','сен','окт','ноя','дек'];
+  const WD = ['вс','пн','вт','ср','чт','пт','сб'];
+  function parseDate(s) { const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d); }
+  function shiftDate(s, days) { const d = parseDate(s); d.setDate(d.getDate()+days); return todayStr(d); }
+  function fmtShort(s) { const [y,m,d] = s.split('-'); return `${+d} ${MON_SHORT[+m-1]}`; }
+  function fmtLong(s) {
+    if (s === todayStr()) return 'Сегодня';
+    if (s === shiftDate(todayStr(), -1)) return 'Вчера';
+    const d = parseDate(s);
+    return `${WD[d.getDay()]}, ${d.getDate()} ${MONTHS[d.getMonth()]}`;
+  }
+
   // --- Настройки / онбординг ---
   function openSetup() {
-    const needRepo = !(cfg().owner && cfg().owner !== 'YOUR_GITHUB_USERNAME' && cfg().repo);
     $('ownerInput').value = cfg().owner === 'YOUR_GITHUB_USERNAME' ? '' : cfg().owner;
     $('repoInput').value = cfg().repo || 'squats-data';
     $('tokenInput').value = getToken();
@@ -340,6 +403,15 @@
     await refresh();
   }
 
+  // --- Табы ---
+  function setTab(tab) {
+    state.tab = tab;
+    document.querySelectorAll('#tabs button').forEach((b) => b.classList.toggle('on', b.dataset.tab === tab));
+    ['record','history','stats'].forEach((t) =>
+      $('panel-' + t).classList.toggle('hidden', t !== tab));
+    if (tab === 'stats') renderCharts();
+  }
+
   // --- Выбор человека ---
   function renderPeople() {
     const box = $('people'); box.innerHTML = '';
@@ -352,34 +424,33 @@
     });
   }
 
-  // --- Сегодня ---
-  function todayCount() {
-    const d = state.data?.days?.[todayStr()] || {};
-    return d[state.me] || 0;
+  // --- Запись (за выбранную дату) ---
+  function dayCount(date, person) { return state.data?.days?.[date]?.[person] || 0; }
+  function renderRecord() {
+    $('datePicker').value = state.date;
+    $('datePicker').max = todayStr();
+    $('dateLabel').textContent = state.me
+      ? `${fmtLong(state.date)} · ${state.me}`
+      : 'Выберите, кто записывает ☝️';
+    $('todayCount').innerHTML = `${dayCount(state.date, state.me)}<small>приседаний</small>`;
   }
-  function renderToday() {
-    if (!state.me) { $('todayCard').classList.add('hidden'); return; }
-    $('todayCard').classList.remove('hidden');
-    $('todayTitle').textContent = `Сегодня · ${state.me}`;
-    $('todayCount').innerHTML = `${todayCount()}<small>приседаний сегодня</small>`;
-  }
-  async function changeToday(delta) { await guard(() => incDay(todayStr(), state.me, delta)); }
-  async function setExact(n) { await guard(() => saveDay(todayStr(), state.me, n)); }
+  async function changeCount(delta) { await guard(() => incDay(state.date, state.me, delta)); }
+  async function setExact(n) { await guard(() => saveDay(state.date, state.me, n)); }
 
-  // Обёртка: блокирует двойные нажатия, показывает статус, перерисовывает.
   async function guard(action) {
     if (state.busy) return;
     if (!state.me) return toast('Сначала выберите, кто записывает', 'err');
     state.busy = true; toast('Сохраняю…');
-    try {
-      state.data = await action();
-      renderAll(); toast('Сохранено ✓', 'ok');
-    } catch (e) { errToast(e); }
+    try { state.data = await action(); renderAll(); toast('Сохранено ✓', 'ok'); }
+    catch (e) { errToast(e); }
     finally { state.busy = false; }
   }
 
-  // --- Таблица истории ---
-  function sortedDates() { return Object.keys(state.data?.days || {}).sort().reverse(); }
+  // --- История ---
+  function sortedDates(asc = false) {
+    const d = Object.keys(state.data?.days || {}).sort();
+    return asc ? d : d.reverse();
+  }
   function renderTable() {
     const people = state.data?.people || [];
     const dates = sortedDates();
@@ -391,14 +462,16 @@
       const day = state.data.days[date] || {};
       const total = people.reduce((s, p) => s + (day[p] || 0), 0);
       const cells = people.map((p) => {
-        const v = day[p] || 0;
-        const meCls = p === state.me ? ' me' : '';
+        const v = day[p] || 0; const meCls = p === state.me ? ' me' : '';
         return `<td class="cell${meCls}" data-date="${date}" data-person="${esc(p)}">${v || '·'}</td>`;
       }).join('');
-      return `<tr><td class="date">${fmtDate(date)}</td>${cells}<td class="total">${total}</td></tr>`;
+      return `<tr><td class="date" data-goto="${date}">${fmtShort(date)}</td>${cells}<td class="total">${total}</td></tr>`;
     }).join('');
     table.innerHTML = head + rows;
     table.querySelectorAll('td.cell').forEach((td) => (td.onclick = () => editCell(td)));
+    table.querySelectorAll('td.date').forEach((td) => (td.onclick = () => {
+      state.date = td.dataset.goto; setTab('record'); renderRecord();
+    }));
   }
   function editCell(td) {
     if (td.querySelector('input')) return;
@@ -408,67 +481,93 @@
     const inp = td.querySelector('input'); inp.focus(); inp.select();
     const commit = async () => {
       const n = parseInt(inp.value, 10);
-      if (Number.isNaN(n) || n < 0) { renderTable(); return; }
-      if (n === cur) { renderTable(); return; }
+      if (Number.isNaN(n) || n < 0 || n === cur) { renderTable(); return; }
       await guard(() => saveDay(date, person, n));
     };
     inp.onblur = commit;
     inp.onkeydown = (e) => { if (e.key === 'Enter') inp.blur(); if (e.key === 'Escape') renderTable(); };
   }
 
+  // --- Статистика ---
+  function streak(person) {
+    // серия = подряд идущие дни с записью, считая от сегодня назад
+    let s = 0, cur = todayStr();
+    while ((state.data.days[cur]?.[person] || 0) > 0) { s++; cur = shiftDate(cur, -1); }
+    return s;
+  }
+  function renderStats() {
+    const people = state.data?.people || [];
+    const datesAsc = sortedDates(true);
+    const hasData = datesAsc.length > 0;
+    $('statsEmpty').classList.toggle('hidden', hasData);
+    $('statCharts').classList.toggle('hidden', !hasData);
+    const grid = $('statGrid');
+    grid.innerHTML = people.map((p, i) => {
+      const vals = datesAsc.map((d) => state.data.days[d]?.[p] || 0);
+      const active = vals.filter((v) => v > 0);
+      const total = vals.reduce((s, v) => s + v, 0);
+      const best = active.length ? Math.max(...active) : 0;
+      const avg = active.length ? Math.round(total / active.length) : 0;
+      const today = dayCount(todayStr(), p);
+      const color = PALETTE[i % PALETTE.length];
+      return `<div class="stat">
+        <div class="name"><span class="dot" style="background:${color}"></span>${esc(p)}</div>
+        <div class="kv"><span>Сегодня</span><b>${today}</b></div>
+        <div class="kv"><span>Всего</span><b>${total}</b></div>
+        <div class="kv"><span>Дней</span><b>${active.length}</b></div>
+        <div class="kv"><span>В среднем</span><b>${avg}</b></div>
+        <div class="kv"><span>Лучший день</span><b>${best}</b></div>
+        <div class="kv"><span>Серия 🔥</span><b>${streak(p)}</b></div>
+      </div>`;
+    }).join('');
+  }
+
   // --- Графики ---
   function renderCharts() {
-    if (!chartReady || typeof Chart === 'undefined') return;
+    if (!chartReady || typeof Chart === 'undefined' || state.tab !== 'stats') return;
     const people = state.data?.people || [];
-    const datesAsc = Object.keys(state.data?.days || {}).sort();
-    $('chartsCard').classList.toggle('hidden', datesAsc.length === 0);
+    const datesAsc = sortedDates(true);
     if (!datesAsc.length) return;
-
-    const lineData = {
-      labels: datesAsc.map(fmtDate),
-      datasets: people.map((p, i) => ({
-        label: p, data: datesAsc.map((d) => state.data.days[d]?.[p] || 0),
+    const lineData = { labels: datesAsc.map(fmtShort),
+      datasets: people.map((p, i) => ({ label: p, data: datesAsc.map((d) => state.data.days[d]?.[p] || 0),
         borderColor: PALETTE[i % PALETTE.length], backgroundColor: PALETTE[i % PALETTE.length],
-        tension: .3, spanGaps: true, pointRadius: 3,
-      })),
-    };
+        tension: .3, spanGaps: true, pointRadius: 3 })) };
     const totals = people.map((p) => datesAsc.reduce((s, d) => s + (state.data.days[d]?.[p] || 0), 0));
-    const barData = { labels: people,
-      datasets: [{ label: 'Всего приседаний', data: totals,
-        backgroundColor: people.map((_, i) => PALETTE[i % PALETTE.length]) }] };
-    const opts = { responsive: true, plugins: { legend: { labels: { color: cssVar('--txt') } } },
+    const barData = { labels: people, datasets: [{ data: totals,
+      backgroundColor: people.map((_, i) => PALETTE[i % PALETTE.length]) }] };
+    const base = { responsive: true, maintainAspectRatio: false,
       scales: { x: { ticks: { color: cssVar('--muted') }, grid: { color: cssVar('--line') } },
         y: { beginAtZero: true, ticks: { color: cssVar('--muted') }, grid: { color: cssVar('--line') } } } };
-
-    if (lineChart) { lineChart.data = lineData; lineChart.update(); }
-    else lineChart = new Chart($('lineChart'), { type: 'line', data: lineData, options: opts });
-    if (barChart) { barChart.data = barData; barChart.update(); }
-    else barChart = new Chart($('barChart'), { type: 'bar', data: barData,
-      options: { ...opts, plugins: { legend: { display: false } } } });
+    const lineOpts = { ...base, plugins: { legend: { labels: { color: cssVar('--txt') } } } };
+    const barOpts = { ...base, plugins: { legend: { display: false } } };
+    if (lineChart) { lineChart.data = lineData; lineChart.options = lineOpts; lineChart.update(); }
+    else lineChart = new Chart($('lineChart'), { type: 'line', data: lineData, options: lineOpts });
+    if (barChart) { barChart.data = barData; barChart.options = barOpts; barChart.update(); }
+    else barChart = new Chart($('barChart'), { type: 'bar', data: barData, options: barOpts });
   }
 
   // --- Утилиты ---
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const cssVar = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
-  const MONTHS = ['янв','фев','мар','апр','мая','июн','июл','авг','сен','окт','ноя','дек'];
-  function fmtDate(s) { const [y, m, d] = s.split('-'); return `${+d} ${MONTHS[+m - 1]}`; }
 
   // --- Рендер всего ---
   function renderAll() {
-    renderPeople(); renderToday(); renderTable(); renderCharts();
-    $('whoCard').classList.remove('hidden');
-    $('historyCard').classList.remove('hidden');
+    renderPeople(); renderRecord(); renderTable(); renderStats(); renderCharts();
+    $('whobar').classList.remove('hidden');
+    $('tabs').classList.remove('hidden');
+    setTab(state.tab);
   }
 
   async function refresh() {
-    if (!isConfigured()) { openSetup(); $('whoCard').classList.add('hidden');
-      $('todayCard').classList.add('hidden'); $('historyCard').classList.add('hidden');
-      $('chartsCard').classList.add('hidden'); return; }
+    if (!isConfigured()) {
+      openSetup();
+      ['whobar','tabs','panel-record','panel-history','panel-stats'].forEach((id) => $(id).classList.add('hidden'));
+      return;
+    }
     toast('Загрузка…');
     try {
       state.data = await loadData();
       if (state.me && !state.data.people.includes(state.me)) state.me = null;
-      if (!state.me && state.data.people.length) { /* пусть выберет сам */ }
       renderAll(); toast('Готово', 'ok');
     } catch (e) { errToast(e); if (e.kind === 'no-token' || e.kind === 'auth') openSetup(); }
   }
@@ -477,9 +576,13 @@
   $('settingsBtn').onclick = openSetup;
   $('saveSetup').onclick = saveSetup;
   $('closeSetup').onclick = closeSetup;
-  $('plus').onclick = () => changeToday(1);
-  $('minus').onclick = () => changeToday(-1);
-  document.querySelectorAll('[data-add]').forEach((b) => (b.onclick = () => changeToday(+b.dataset.add)));
+  document.querySelectorAll('#tabs button').forEach((b) => (b.onclick = () => setTab(b.dataset.tab)));
+  $('dayPrev').onclick = () => { state.date = shiftDate(state.date, -1); renderRecord(); };
+  $('dayNext').onclick = () => { if (state.date < todayStr()) { state.date = shiftDate(state.date, 1); renderRecord(); } };
+  $('datePicker').onchange = (e) => { state.date = e.target.value || todayStr(); renderRecord(); };
+  $('plus').onclick = () => changeCount(1);
+  $('minus').onclick = () => changeCount(-1);
+  document.querySelectorAll('[data-add]').forEach((b) => (b.onclick = () => changeCount(+b.dataset.add)));
   $('setExact').onclick = () => {
     const n = parseInt($('exactInput').value, 10);
     if (Number.isNaN(n) || n < 0) return toast('Введите целое число ≥ 0', 'err');
@@ -488,12 +591,12 @@
   $('refreshBtn').onclick = refresh;
   document.addEventListener('visibilitychange', () => { if (!document.hidden && isConfigured()) refresh(); });
 
-  // --- Подгрузка Chart.js и старт ---
+  // --- Chart.js + старт ---
   (function loadChartJs() {
     const s = document.createElement('script');
     s.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js';
     s.onload = () => { chartReady = true; renderCharts(); };
-    s.onerror = () => { chartReady = false; }; // приложение работает и без графиков
+    s.onerror = () => { chartReady = false; };
     document.head.appendChild(s);
   })();
 
